@@ -1,0 +1,12 @@
+{
+  "wiki_url": "",
+  "output_dir": "wiki_data/default",
+  "max_depth": 3,
+  "download_images": true,
+  "download_tables": true,
+  "user_agent": "GameWikiFetcher/1.0",
+  "delay": 1.0,
+  "threads": 3,
+  "save_html": false,
+  "max_retries": 3
+} 

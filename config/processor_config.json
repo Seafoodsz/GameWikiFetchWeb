@@ -1,0 +1,42 @@
+{
+  "input_dir": "data/input",
+  "output_dir": "data/output",
+  "threads": 4,
+  "processors": {
+    "character": {
+      "enabled": true,
+      "input_pattern": "characters/*.html",
+      "keywords": ["职业", "属性", "技能树", "特性"]
+    },
+    "item": {
+      "enabled": true,
+      "input_pattern": "items/*.html",
+      "categories": ["武器", "护甲", "消耗品", "材料", "宝石"],
+      "keywords": ["类型", "伤害", "防御", "效果", "价值"]
+    },
+    "skill": {
+      "enabled": true,
+      "input_pattern": "skills/*.html",
+      "keywords": ["技能", "效果", "冷却", "消耗"]
+    },
+    "enemy": {
+      "enabled": true,
+      "input_pattern": "enemies/*.html",
+      "keywords": ["生命值", "攻击", "防御", "弱点", "掉落物"]
+    },
+    "location": {
+      "enabled": true,
+      "input_pattern": "locations/*.html",
+      "keywords": ["区域", "NPC", "资源", "任务"]
+    },
+    "quest": {
+      "enabled": true,
+      "input_pattern": "quests/*.html",
+      "keywords": ["目标", "奖励", "前置条件", "步骤"]
+    },
+    "relation": {
+      "enabled": true,
+      "relation_types": ["角色-技能", "物品-敌人", "地点-任务", "任务-奖励"]
+    }
+  }
+} 

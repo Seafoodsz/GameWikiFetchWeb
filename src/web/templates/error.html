@@ -1,0 +1,59 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block title %}错误 - GameWiki抓取工具{% endblock %}
+
+{% block styles %}
+{{super()}}
+<style>
+    body {
+        background-color: #2c3e50;
+        color: #ecf0f1;
+        font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .error-container {
+        max-width: 600px;
+        margin: 100px auto;
+        text-align: center;
+        background-color: #34495e;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .error-icon {
+        font-size: 64px;
+        color: #e74c3c;
+        margin-bottom: 20px;
+    }
+    .error-title {
+        font-size: 24px;
+        color: #e74c3c;
+        margin-bottom: 15px;
+    }
+    .error-message {
+        color: #95a5a6;
+        margin-bottom: 25px;
+    }
+    .btn-home {
+        background-color: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+    .btn-home:hover {
+        background-color: #2980b9;
+        color: white;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-icon">⚠️</div>
+    <h1 class="error-title">出错了！</h1>
+    <p class="error-message">{{ error }}</p>
+    <a href="{{ url_for('index') }}" class="btn-home">返回首页</a>
+</div>
+{% endblock %} 

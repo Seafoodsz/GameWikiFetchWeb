@@ -1,0 +1,14 @@
+{
+  "type": "json",
+  "mongodb_uri": "mongodb://localhost:27017/",
+  "mongodb_db": "gamewiki",
+  "sqlite_path": "data/gamewiki.db",
+  "batch_size": 100,
+  "memory_limit_mb": 500,
+  "use_streaming": true,
+  "export": {
+    "formats": ["json", "csv", "html"],
+    "compress": false,
+    "pretty_json": true
+  }
+} 

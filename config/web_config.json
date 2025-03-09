@@ -1,0 +1,12 @@
+{
+  "host": "0.0.0.0",
+  "port": 5000,
+  "debug": false,
+  "secret_key": "",
+  "upload_folder": "data/uploads",
+  "allowed_extensions": ["html", "htm", "json", "xml"],
+  "max_content_length": 16777216,
+  "theme": "default",
+  "language": "zh_CN",
+  "session_lifetime": 86400
+} 

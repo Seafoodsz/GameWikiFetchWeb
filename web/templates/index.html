@@ -1,0 +1,745 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block title %}GameWiki抓取工具{% endblock %}
+
+{% block styles %}
+{{super()}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<style>
+    body {
+        background-color: #2c3e50;
+        color: #ecf0f1;
+        font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .card {
+        background-color: #34495e;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+        padding: 20px;
+    }
+    .card-header {
+        border-bottom: 1px solid #3d566e;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+    }
+    .card-title {
+        color: #3498db;
+        font-size: 1.5rem;
+        margin: 0;
+    }
+    .form-control {
+        background-color: #2c3e50;
+        border: 1px solid #3d566e;
+        color: #ecf0f1;
+    }
+    .form-control:focus {
+        background-color: #2c3e50;
+        border-color: #3498db;
+        color: #ecf0f1;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    .btn-primary {
+        background-color: #3498db;
+        border-color: #3498db;
+    }
+    .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2980b9;
+    }
+    .btn-danger {
+        background-color: #e74c3c;
+        border-color: #e74c3c;
+    }
+    .btn-danger:hover {
+        background-color: #c0392b;
+        border-color: #c0392b;
+    }
+    .btn-success {
+        background-color: #2ecc71;
+        border-color: #2ecc71;
+    }
+    .btn-success:hover {
+        background-color: #27ae60;
+        border-color: #27ae60;
+    }
+    .progress {
+        height: 25px;
+        background-color: #2c3e50;
+        position: relative;
+        overflow: hidden;
+    }
+    .progress-bar {
+        background-color: #3498db;
+        color: #fff;
+        text-align: center;
+        line-height: 25px;
+        font-weight: bold;
+        transition: width 0.5s ease;
+    }
+    .progress-bar.active {
+        position: relative;
+    }
+    .progress-bar.active::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+        background-size: 50px 50px;
+        animation: progress-animation 2s linear infinite;
+        z-index: 1;
+    }
+    @keyframes progress-animation {
+        0% {
+            background-position: 0 0;
+        }
+        100% {
+            background-position: 50px 50px;
+        }
+    }
+    .progress-bar-success {
+        background-color: #2ecc71;
+    }
+    .progress-bar-warning {
+        background-color: #f39c12;
+    }
+    .progress-bar-danger {
+        background-color: #e74c3c;
+    }
+    .log-container {
+        background-color: #2c3e50;
+        border: 1px solid #3d566e;
+        border-radius: 4px;
+        color: #ecf0f1;
+        font-family: 'Courier New', Courier, monospace;
+        height: 300px;
+        overflow-y: auto;
+        padding: 10px;
+    }
+    .log-entry {
+        margin-bottom: 5px;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    .log-info {
+        color: #3498db;
+    }
+    .log-warning {
+        color: #f39c12;
+    }
+    .log-error {
+        color: #e74c3c;
+    }
+    .log-debug {
+        color: #95a5a6;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        color: #3498db;
+        font-weight: bold;
+    }
+    .form-text {
+        color: #95a5a6;
+    }
+    .alert {
+        border-radius: 4px;
+    }
+    .status-badge {
+        font-size: 1rem;
+        padding: 5px 10px;
+        border-radius: 4px;
+    }
+    .status-ready {
+        background-color: #3498db;
+    }
+    .status-running {
+        background-color: #f39c12;
+    }
+    .status-completed {
+        background-color: #2ecc71;
+    }
+    .status-error {
+        background-color: #e74c3c;
+    }
+    .status-stopped {
+        background-color: #95a5a6;
+    }
+    .status-organizing {
+        background-color: #9b59b6;
+    }
+    .nav-tabs {
+        border-bottom: 1px solid #3d566e;
+    }
+    .nav-tabs .nav-link {
+        color: #ecf0f1;
+        border: none;
+    }
+    .nav-tabs .nav-link:hover {
+        border-color: transparent;
+        color: #3498db;
+    }
+    .nav-tabs .nav-link.active {
+        background-color: #34495e;
+        border-color: #3d566e #3d566e #34495e;
+        color: #3498db;
+    }
+    .tab-content {
+        padding: 20px 0;
+    }
+    .icon-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .app-icon {
+        font-size: 2.5rem;
+        margin-right: 15px;
+        color: #3498db;
+    }
+    .app-title {
+        font-size: 2rem;
+        margin: 0;
+        color: #ecf0f1;
+    }
+    .app-subtitle {
+        font-size: 1rem;
+        margin: 0;
+        color: #95a5a6;
+    }
+    .stats-container {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+    }
+    .stat-card {
+        flex: 1;
+        min-width: 120px;
+        background-color: #2c3e50;
+        border-radius: 4px;
+        padding: 15px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    .stat-card:last-child {
+        margin-right: 0;
+    }
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #3498db;
+        margin-bottom: 5px;
+    }
+    .stat-label {
+        font-size: 0.9rem;
+        color: #95a5a6;
+    }
+    .progress-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+    }
+    .progress-percent {
+        font-weight: bold;
+        color: #3498db;
+    }
+    .progress-numbers {
+        color: #95a5a6;
+    }
+    .speed-indicator {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 0.9rem;
+        margin-left: 5px;
+    }
+    .speed-slow {
+        background-color: #e74c3c;
+        color: white;
+    }
+    .speed-medium {
+        background-color: #f39c12;
+        color: white;
+    }
+    .speed-fast {
+        background-color: #2ecc71;
+        color: white;
+    }
+    .action-buttons {
+        margin-top: 20px;
+    }
+    .action-buttons .btn {
+        margin-bottom: 10px;
+    }
+    .top-actions {
+        background-color: #34495e;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .top-actions .btn {
+        margin-left: 10px;
+        min-width: 120px;
+    }
+    .top-actions .status-info {
+        display: flex;
+        align-items: center;
+    }
+    .top-actions .status-badge {
+        margin-left: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- 应用标题 -->
+    <div class="icon-container">
+        <i class="bi bi-globe app-icon"></i>
+        <div>
+            <h1 class="app-title">GameWiki抓取工具</h1>
+            <p class="app-subtitle">轻松获取游戏Wiki资料并保存到本地</p>
+        </div>
+    </div>
+
+    <!-- 顶部操作栏 -->
+    <div class="top-actions">
+        <div class="status-info">
+            <strong>状态：</strong>
+            <span class="badge status-badge 
+                {% if progress.status == '就绪' %}status-ready
+                {% elif progress.status == '正在运行' %}status-running
+                {% elif progress.status == '已完成' %}status-completed
+                {% elif progress.status == '出错' %}status-error
+                {% elif progress.status == '已停止' %}status-stopped
+                {% elif progress.status == '正在整理' %}status-organizing
+                {% elif progress.status == '整理完成' %}status-completed
+                {% elif progress.status == '整理出错' %}status-error
+                {% endif %}">
+                {{ progress.status }}
+            </span>
+        </div>
+        <div class="action-buttons">
+            {% if is_running %}
+                <form method="POST" action="{{ url_for('stop_fetcher') }}" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-stop-circle"></i> 停止抓取
+                    </button>
+                </form>
+            {% else %}
+                <button type="button" class="btn btn-primary" id="start-fetch-btn">
+                    <i class="bi bi-play-circle"></i> 开始抓取
+                </button>
+                {% if not is_running and not is_organizing %}
+                    <form method="POST" action="{{ url_for('organize_content') }}" style="display: inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-folder-check"></i> 整理内容
+                        </button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 闪现消息 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <!-- 左侧：配置表单 -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="bi bi-gear"></i> 抓取配置</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('start_fetcher') }}" id="fetcher-form">
+                        {{ form.csrf_token }}
+                        
+                        <div class="form-group">
+                            {{ form.wiki_url.label }}
+                            {{ form.wiki_url(class="form-control") }}
+                            <small class="form-text text-muted">{{ form.wiki_url.description }}</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ form.output_dir.label }}
+                            {{ form.output_dir(class="form-control") }}
+                            <small class="form-text">{{ form.output_dir.description }}</small>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.max_depth.label }}
+                                    {{ form.max_depth(class="form-control") }}
+                                    <small class="form-text">{{ form.max_depth.description }}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.threads.label }}
+                                    {{ form.threads(class="form-control") }}
+                                    <small class="form-text">{{ form.threads.description }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.delay.label }}
+                                    {{ form.delay(class="form-control") }}
+                                    <small class="form-text">{{ form.delay.description }}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.max_retries.label }}
+                                    {{ form.max_retries(class="form-control") }}
+                                    <small class="form-text">{{ form.max_retries.description }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ form.user_agent.label }}
+                            {{ form.user_agent(class="form-control") }}
+                            <small class="form-text">{{ form.user_agent.description }}</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ form.log_level.label }}
+                            {{ form.log_level(class="form-control") }}
+                            <small class="form-text">{{ form.log_level.description }}</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="form-check">
+                                {{ form.download_images(class="form-check-input") }}
+                                {{ form.download_images.label(class="form-check-label") }}
+                                <small class="form-text d-block">{{ form.download_images.description }}</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="form-check">
+                                {{ form.download_tables(class="form-check-input") }}
+                                {{ form.download_tables.label(class="form-check-label") }}
+                                <small class="form-text d-block">{{ form.download_tables.description }}</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="form-check">
+                                {{ form.save_html(class="form-check-input") }}
+                                {{ form.save_html.label(class="form-check-label") }}
+                                <small class="form-text d-block">{{ form.save_html.description }}</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="bi bi-play-circle"></i> 开始抓取
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧：进度和日志 -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="bi bi-activity"></i> 抓取状态</h3>
+                </div>
+                <div class="card-body">
+                    <!-- 统计信息 -->
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-value" id="pages-count">{{ progress.pages_count|default(0) }}</div>
+                            <div class="stat-label">页面数量</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="images-count">{{ progress.images_count|default(0) }}</div>
+                            <div class="stat-label">图片数量</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="error-count">{{ progress.error_count|default(0) }}</div>
+                            <div class="stat-label">错误数量</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="speed-value">{{ progress.processing_speed|default(0) }}</div>
+                            <div class="stat-label">页/分钟</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>进度：</strong> <span id="progress-text">{{ progress.current }}/{{ progress.total }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>开始时间：</strong> <span id="start-time">{{ progress.start_time or '未开始' }}</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>结束时间：</strong> <span id="end-time">{{ progress.end_time or '未结束' }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>处理速度：</strong> <span id="speed-value">{{ progress.processing_speed|default(0) }}</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-stats">
+                        <div class="progress-percent" id="progress-percent">
+                            {% if progress.total > 0 %}{{ (progress.current / progress.total * 100)|round|int }}{% else %}0{% endif %}%
+                        </div>
+                        <div class="progress-numbers" id="progress-text">{{ progress.current }}/{{ progress.total }}</div>
+                    </div>
+                    
+                    <div class="progress mb-4">
+                        <div id="progress-bar" class="progress-bar 
+                            {% if progress.total > 0 and (progress.current / progress.total * 100)|round|int >= 100 %}progress-bar-success
+                            {% elif progress.total > 0 and (progress.current / progress.total * 100)|round|int >= 66 %}progress-bar-info
+                            {% elif progress.total > 0 and (progress.current / progress.total * 100)|round|int >= 33 %}progress-bar-warning
+                            {% else %}progress-bar-danger{% endif %}" 
+                            role="progressbar" 
+                            style="width: {% if progress.total > 0 %}{{ (progress.current / progress.total * 100)|round|int }}{% else %}0{% endif %}%;" 
+                            aria-valuenow="{% if progress.total > 0 %}{{ (progress.current / progress.total * 100)|round|int }}{% else %}0{% endif %}" 
+                            aria-valuemin="0" aria-valuemax="100">
+                            {% if progress.total > 0 %}{{ (progress.current / progress.total * 100)|round|int }}%{% else %}0%{% endif %}
+                        </div>
+                    </div>
+                    
+                    <h4><i class="bi bi-journal-text"></i> 日志输出</h4>
+                    <div id="log-container" class="log-container">
+                        {% for log in progress.log_messages %}
+                            <div class="log-entry log-{{ log.level|lower }}">
+                                <span class="log-time">[{{ log.time }}]</span>
+                                <span class="log-level">[{{ log.level }}]</span>
+                                <span class="log-msg">{{ log.message }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- 内容整理按钮 -->
+                    <div class="action-buttons">
+                        {% if not is_running and not is_organizing %}
+                            <form method="POST" action="{{ url_for('organize_content') }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-success btn-block">
+                                    <i class="bi bi-folder-check"></i> 整理抓取内容
+                                </button>
+                            </form>
+                        {% endif %}
+                        
+                        {% if progress.status == '整理完成' %}
+                            <a href="{{ url_for('view_index') }}" target="_blank" class="btn btn-info btn-block">
+                                <i class="bi bi-eye"></i> 查看整理后的内容
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script>
+    // 全局变量
+    let lastProcessedCount = 0;
+    let processSpeed = 0;
+    let startTime = null;
+    let lastSpeedUpdate = Date.now();
+    
+    // 格式化时间
+    function formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+    
+    // 更新处理速度指示器
+    function updateSpeedIndicator(speed) {
+        const speedValue = document.getElementById('speed-value');
+        speedValue.innerText = speed;
+        
+        // 根据速度设置颜色
+        if (speed <= 5) {
+            speedValue.style.color = '#e74c3c'; // 慢速 - 红色
+        } else if (speed <= 15) {
+            speedValue.style.color = '#f39c12'; // 中速 - 橙色
+        } else {
+            speedValue.style.color = '#2ecc71'; // 快速 - 绿色
+        }
+    }
+    
+    // 定期更新进度和日志
+    function updateProgress() {
+        fetch('/progress')
+            .then(response => response.json())
+            .then(data => {
+                // 更新统计数据
+                document.getElementById('pages-count').innerText = data.pages_count || 0;
+                document.getElementById('images-count').innerText = data.images_count || 0;
+                document.getElementById('error-count').innerText = data.error_count || 0;
+                
+                // 更新处理速度
+                updateSpeedIndicator(data.processing_speed || 0);
+                
+                // 更新进度条
+                const progressPercent = data.total > 0 ? Math.round(data.current / data.total * 100) : 0;
+                const progressBar = document.getElementById('progress-bar');
+                
+                progressBar.style.width = progressPercent + '%';
+                progressBar.setAttribute('aria-valuenow', progressPercent);
+                progressBar.innerText = progressPercent + '%';
+                
+                // 添加动画效果
+                if (data.status === '正在运行' || data.status === '正在整理') {
+                    progressBar.classList.add('active');
+                } else {
+                    progressBar.classList.remove('active');
+                }
+                
+                // 更新进度百分比和数字
+                document.getElementById('progress-percent').innerText = progressPercent + '%';
+                document.getElementById('progress-text').innerText = data.current + '/' + data.total;
+                
+                // 根据进度更新进度条颜色
+                progressBar.className = 'progress-bar';
+                if (progressPercent >= 100) {
+                    progressBar.classList.add('progress-bar-success');
+                } else if (progressPercent >= 66) {
+                    progressBar.classList.add('progress-bar-info');
+                } else if (progressPercent >= 33) {
+                    progressBar.classList.add('progress-bar-warning');
+                } else {
+                    progressBar.classList.add('progress-bar-danger');
+                }
+                
+                // 更新时间
+                if (data.start_time) {
+                    document.getElementById('start-time').innerText = data.start_time;
+                }
+                if (data.end_time) {
+                    document.getElementById('end-time').innerText = data.end_time;
+                }
+                
+                // 更新状态标签
+                const statusBadge = document.querySelector('.status-badge');
+                statusBadge.innerText = data.status;
+                statusBadge.className = 'badge status-badge';
+                
+                if (data.status === '就绪') {
+                    statusBadge.classList.add('status-ready');
+                } else if (data.status === '正在运行') {
+                    statusBadge.classList.add('status-running');
+                } else if (data.status === '已完成') {
+                    statusBadge.classList.add('status-completed');
+                } else if (data.status === '出错') {
+                    statusBadge.classList.add('status-error');
+                } else if (data.status === '已停止') {
+                    statusBadge.classList.add('status-stopped');
+                } else if (data.status === '正在整理') {
+                    statusBadge.classList.add('status-organizing');
+                } else if (data.status === '整理完成') {
+                    statusBadge.classList.add('status-completed');
+                } else if (data.status === '整理出错') {
+                    statusBadge.classList.add('status-error');
+                }
+                
+                // 如果任务已完成，刷新页面以更新按钮状态
+                if ((data.status === '已完成' || data.status === '出错' || data.status === '已停止' || 
+                     data.status === '整理完成' || data.status === '整理出错') && 
+                    (document.querySelector('button[formaction="{{ url_for("stop_fetcher") }}"]') || 
+                     document.querySelector('.status-organizing'))) {
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                }
+            });
+    }
+    
+    function updateLogs() {
+        fetch('/logs')
+            .then(response => response.json())
+            .then(logs => {
+                const logContainer = document.getElementById('log-container');
+                logContainer.innerHTML = '';
+                
+                logs.forEach(log => {
+                    const logEntry = document.createElement('div');
+                    logEntry.className = `log-entry log-${log.level.toLowerCase()}`;
+                    
+                    const timeSpan = document.createElement('span');
+                    timeSpan.className = 'log-time';
+                    timeSpan.innerText = `[${log.time}]`;
+                    
+                    const levelSpan = document.createElement('span');
+                    levelSpan.className = 'log-level';
+                    levelSpan.innerText = `[${log.level}]`;
+                    
+                    const msgSpan = document.createElement('span');
+                    msgSpan.className = 'log-msg';
+                    msgSpan.innerText = log.message;
+                    
+                    logEntry.appendChild(timeSpan);
+                    logEntry.appendChild(document.createTextNode(' '));
+                    logEntry.appendChild(levelSpan);
+                    logEntry.appendChild(document.createTextNode(' '));
+                    logEntry.appendChild(msgSpan);
+                    
+                    logContainer.appendChild(logEntry);
+                });
+                
+                // 滚动到底部
+                logContainer.scrollTop = logContainer.scrollHeight;
+            });
+    }
+    
+    // 页面加载完成后开始定期更新
+    document.addEventListener('DOMContentLoaded', function() {
+        // 初始滚动日志到底部
+        const logContainer = document.getElementById('log-container');
+        logContainer.scrollTop = logContainer.scrollHeight;
+        
+        // 每2秒更新一次进度和日志
+        setInterval(updateProgress, 2000);
+        setInterval(updateLogs, 2000);
+    });
+    
+    // 顶部开始抓取按钮点击事件
+    document.getElementById('start-fetch-btn').addEventListener('click', function() {
+        document.getElementById('fetcher-form').submit();
+    });
+</script>
+{% endblock %} 
