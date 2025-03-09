@@ -1,301 +1,113 @@
-# Stoneshard Wiki 数据整理程序
+# GameWiki Fetcher 使用指南
 
-这是一个用于处理从 Stoneshard Wiki 抓取的数据，并将其转化为结构化的游戏数据库的程序。
+## 简介
 
-## 功能特点
-
-- 支持处理多种游戏数据类型：角色、技能、物品、敌人、地点、任务等
-- 自动提取数据之间的关系，如角色-技能、物品-敌人、地点-任务、任务-奖励等
-- 支持多种数据存储方式：JSON、MongoDB、SQLite
-- 灵活的配置系统，可以根据需要启用或禁用特定的处理器
-- 详细的日志记录，方便调试和追踪处理过程
-- 支持导出多种格式的数据：JSON、CSV、HTML
+GameWiki Fetcher 是一个用于获取游戏Wiki资料并保存到本地的工具。它可以抓取Wiki页面的文本内容、图片、表格等资源，并以结构化的方式保存到本地，方便离线查阅和使用。
 
 ## 系统要求
 
 - Python 3.6 或更高版本
-- 依赖库：BeautifulSoup4、pymongo（可选，用于 MongoDB 支持）
+- 网络连接
+- 足够的磁盘空间（取决于Wiki的大小）
 
-## 安装
+## 快速开始
 
-1. 克隆或下载本仓库
-2. 安装依赖库：
+### Windows 用户
 
-```bash
-pip install -r requirements.txt
-```
+1. 双击 `run.bat` 文件
+2. 首次运行时，程序会自动创建虚拟环境并安装依赖
+3. 程序将使用 `.env` 文件中的配置开始抓取Wiki
 
-## 使用方法
+### Linux/Mac 用户
 
-### 基本用法
+1. 打开终端，进入程序目录
+2. 执行 `./run.sh` 命令
+3. 首次运行时，程序会自动创建虚拟环境并安装依赖
+4. 程序将使用 `.env` 文件中的配置开始抓取Wiki
 
-```bash
-python stoneshard_data_processor.py
-```
+## 配置选项
 
-这将使用默认配置文件 `config.json` 运行程序。
+你可以通过编辑 `.env` 文件或使用命令行参数来配置程序的行为。
 
-### 指定配置文件
+### 必填配置
 
-```bash
-python stoneshard_data_processor.py --config path/to/config.json
-```
+- `WIKI_URL`: Wiki网站的基础URL，例如 `https://minecraft.fandom.com/zh/wiki/Minecraft_Wiki`
+- `OUTPUT_DIR`: 本地保存数据的目录，例如 `./wiki_data`
 
-### 指定输入和输出目录
+### 可选配置
 
-```bash
-python stoneshard_data_processor.py --input path/to/input --output path/to/output
-```
+- `MAX_DEPTH`: 抓取的最大深度（默认为3）
+- `DOWNLOAD_IMAGES`: 是否下载图片（默认为True）
+- `DOWNLOAD_TABLES`: 是否下载表格数据（默认为True）
+- `USER_AGENT`: 自定义User-Agent
+- `DELAY`: 请求之间的延迟（秒）（默认为1）
+- `THREADS`: 并发下载线程数（默认为3）
+- `SAVE_HTML`: 是否保存原始HTML（默认为False）
+- `LOG_LEVEL`: 日志级别（默认为INFO）
 
-### 指定日志级别
+## 命令行参数
 
-```bash
-python stoneshard_data_processor.py --log-level DEBUG
-```
-
-可选的日志级别：DEBUG、INFO、WARNING、ERROR
-
-## 配置文件
-
-配置文件使用 JSON 格式，包含以下主要部分：
-
-- 基本配置：输入/输出目录、日志级别等
-- 数据库配置：数据库类型、连接信息等
-- 处理器配置：各种处理器的配置信息
-- 分析配置：数据分析和可视化选项
-- 导出配置：数据导出格式和选项
-
-详细的配置选项请参考 `config.json` 文件。
-
-## 目录结构
+你也可以使用命令行参数来覆盖 `.env` 文件中的配置：
 
 ```
-stoneshard_data_processor/
-├── stoneshard_data_processor.py  # 主程序
-├── config.json                   # 配置文件
-├── requirements.txt              # 依赖库列表
-├── README.md                     # 说明文档
-├── processors/                   # 处理器模块
-│   ├── base_processor.py         # 基础处理器
-│   ├── character_processor.py    # 角色处理器
-│   ├── skill_processor.py        # 技能处理器
-│   ├── item_processor.py         # 物品处理器
-│   ├── enemy_processor.py        # 敌人处理器
-│   ├── location_processor.py     # 地点处理器
-│   ├── quest_processor.py        # 任务处理器
-│   └── relation_processor.py     # 关系处理器
-└── utils/                        # 工具模块
-    ├── config.py                 # 配置模块
-    ├── database.py               # 数据库模块
-    └── logger.py                 # 日志模块
+python run.py --wiki-url https://game-wiki-url.com --output-dir ./wiki_data
 ```
 
-## 数据结构
+可用的命令行参数与 `.env` 文件中的配置项对应。
 
-程序处理后的数据将按照以下结构组织：
+## 输出结构
 
-### 角色数据
+程序会在指定的输出目录中创建以下结构：
 
-```json
-{
-  "id": "warrior",
-  "name": "战士",
-  "type": "character",
-  "description": "...",
-  "attributes": {
-    "strength": 12,
-    "dexterity": 8,
-    "...": "..."
-  },
-  "skills": [...],
-  "traits": [...],
-  "starting_items": [...]
-}
+```
+wiki_data/
+├── pages/           # 页面内容（Markdown格式）
+│   ├── page1.md
+│   ├── page1.json   # 页面元数据
+│   ├── page1_tables.json  # 表格数据
+│   └── ...
+├── images/          # 图片资源
+│   ├── image1.jpg
+│   ├── image2.png
+│   └── ...
+├── html/            # 原始HTML（如果配置了保存HTML）
+│   ├── page1.html
+│   └── ...
+└── index.md         # 内容索引
 ```
 
-### 技能数据
+## 常见问题
 
-```json
-{
-  "id": "cleave",
-  "name": "横扫",
-  "type": "skill",
-  "skill_type": "active",
-  "skill_tree": "combat",
-  "description": "...",
-  "effects": [...],
-  "requirements": {...},
-  "cooldown": 3,
-  "energy_cost": 15,
-  "level_requirements": [...]
-}
-```
+### 程序运行速度很慢
 
-### 物品数据
+- 尝试减小 `MAX_DEPTH` 值
+- 增加 `THREADS` 值可以提高并发下载数量
+- 如果不需要图片，可以设置 `DOWNLOAD_IMAGES=False`
 
-```json
-{
-  "id": "iron_sword",
-  "name": "铁剑",
-  "type": "item",
-  "category": "weapon",
-  "item_type": "one_handed_sword",
-  "description": "...",
-  "attributes": {
-    "damage": 10,
-    "...": "..."
-  },
-  "effects": [...],
-  "requirements": {...},
-  "value": 100,
-  "weight": 2.5
-}
-```
+### 抓取过程中出现错误
 
-### 敌人数据
+- 检查网络连接
+- 增加 `DELAY` 值，减少请求频率
+- 查看 `wiki_fetcher.log` 文件了解详细错误信息
 
-```json
-{
-  "id": "wolf",
-  "name": "狼",
-  "type": "enemy",
-  "enemy_type": "beast",
-  "description": "...",
-  "stats": {
-    "health": 50,
-    "...": "..."
-  },
-  "resistances": {...},
-  "weaknesses": [...],
-  "abilities": [...],
-  "drops": [...]
-}
-```
+### 如何只抓取特定页面
 
-### 地点数据
+- 将 `MAX_DEPTH` 设置为0，这样只会抓取起始URL指定的页面
 
-```json
-{
-  "id": "osbrook",
-  "name": "奥斯布鲁克",
-  "type": "location",
-  "location_type": "town",
-  "description": "...",
-  "coordinates": {
-    "x": 100,
-    "y": 200
-  },
-  "npcs": [...],
-  "enemies": [...],
-  "resources": [...],
-  "quests": [...]
-}
-```
+## 高级用法
 
-### 任务数据
+### 增量更新
 
-```json
-{
-  "id": "first_blood",
-  "name": "初次杀戮",
-  "type": "quest",
-  "quest_type": "main",
-  "description": "...",
-  "giver": "村长",
-  "location": "奥斯布鲁克",
-  "prerequisites": [...],
-  "objectives": [...],
-  "steps": [...],
-  "rewards": [...]
-}
-```
+如果你想定期更新已下载的Wiki内容，可以：
 
-### 关系数据
+1. 保留之前的输出目录
+2. 重新运行程序，它会跳过已下载的页面
+3. 新的或更改的页面会被更新
 
-```json
-{
-  "id": "warrior_cleave",
-  "source_type": "character",
-  "source_id": "warrior",
-  "target_type": "skill",
-  "target_id": "cleave",
-  "relation_type": "character_skill",
-  "data": {
-    "character_name": "战士",
-    "skill_name": "横扫",
-    "...": "..."
-  }
-}
-```
+### 自定义解析规则
+
+如果你需要针对特定Wiki定制解析规则，可以修改 `src/parser.py` 文件中的相关代码。
 
 ## 许可证
 
-本项目采用 MIT 许可证。详情请参阅 LICENSE 文件。
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request。
-
-## 优化说明
-
-本项目已进行了以下优化，以提高性能、可维护性和用户体验：
-
-### 已实施的优化
-
-1. **多线程数据处理**
-   - 使用ThreadPoolExecutor实现并行处理不同数据类型
-   - 添加并发度配置选项，默认使用CPU核心数的一半
-   - 独立处理器并行执行，依赖处理器顺序执行
-   - 显著提高了数据处理速度，特别是在多核CPU上
-
-2. **增强错误处理**
-   - 添加全局异常处理装饰器，捕获并记录详细的异常信息
-   - 实现上下文日志记录器，提供更好的日志上下文
-   - 改进错误消息，包含更多上下文信息
-   - 提高了系统稳定性和问题诊断能力
-
-3. **统一配置管理**
-   - 支持多种配置源（默认配置、配置文件、环境变量）
-   - 实现配置验证和类型转换
-   - 添加配置覆盖机制（命令行 > 环境变量 > 配置文件 > 默认值）
-   - 使配置管理更加灵活和健壮
-
-4. **内存优化**
-   - 实现数据流处理，使用生成器而不是列表
-   - 添加批处理机制，控制内存使用
-   - 使用ijson进行大型JSON文件的流式解析
-   - 添加内存监控和自动垃圾回收
-   - 显著减少了内存占用，提高了大数据集处理能力
-
-### 后续优化建议
-
-1. **代码结构优化**
-   - 创建统一的CLI工具，整合所有功能
-   - 简化目录结构，提高可维护性
-   - 标准化模块命名和导入
-
-2. **用户体验优化**
-   - 更新Web界面，使用现代化前端框架
-   - 添加数据可视化功能
-   - 提供更多数据导出选项
-
-3. **性能进一步优化**
-   - 实现异步网络请求，使用aiohttp替代requests
-   - 添加缓存机制，减少重复计算
-   - 优化数据库操作，减少IO开销
-
-## 内存优化详情
-
-为了处理大型Wiki数据集，本项目实施了以下内存优化措施：
-
-1. **批量处理**：数据处理分批进行，每批处理固定数量的项目，避免一次性加载所有数据到内存。
-
-2. **流式JSON处理**：使用ijson库进行大型JSON文件的流式解析，避免一次性加载整个文件到内存。
-
-3. **内存监控**：实时监控程序内存使用情况，当内存使用超过配置的限制时，自动触发垃圾回收。
-
-4. **内存使用统计**：记录处理过程中的内存使用情况，包括峰值内存使用和平均内存使用，方便用户了解程序的资源需求。
-
-5. **生成器模式**：使用生成器替代列表，实现惰性计算，减少内存占用。
-
-这些优化措施使程序能够处理更大规模的数据集，同时保持较低的内存占用。
+本程序使用 MIT 许可证。请注意，从Wiki获取的内容可能受到版权保护，使用时请遵守相关法律法规和Wiki的使用条款。 
